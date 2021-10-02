@@ -324,6 +324,22 @@
                             <img src="{{ asset('front/images/deal_detail/sizzlin.png') }}" alt="Image" />
                             <img src="{{ asset('front/images/deal_detail/sizzlin.png') }}" alt="Image" />
                         @endforelse
+
+                        <?php
+                            foreach ($sub_services as $sub_service):
+                                $image = '';
+                                if (isset($sub_service->image[0])) {
+                                    $image = $sub_service->image[0];
+                                }
+                        ?>
+                        @php if (!empty($image)) { @endphp
+                            <img src="{{ asset('user-uploads/service/'.$sub_service->id.'/'.$image) }}" alt="Image" />
+                        @php } @endphp
+
+                        <?php
+                    endforeach;
+                        ?>
+
                     </div>
                 </div>
             </div>

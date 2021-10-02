@@ -278,6 +278,9 @@
         $('#select-id').html('<?=date('Y-m-d', time());?>');
 
         $(function () {
+
+            getBookingSlots({ bookingDate:  '<?=date('Y-m-d', time());?>', _token: "{{ csrf_token() }}"});
+
             @if (sizeof($bookingDetails) > 0)
                 getBookingSlots({ bookingDate:  '{{ $bookingDetails['bookingDate'] }}', _token: "{{ csrf_token() }}"});
                 var bookingDate = '{{ $bookingDetails['bookingDate'] }}';
