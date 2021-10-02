@@ -1,0 +1,8 @@
+[31-Aug-2021 14:58:33 UTC] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Support\Facades\Auth' not found in /home/eurotouchdesigns/public_html/dealtamin/routes/web.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/eurotouchdesigns/public_html/dealtamin/routes/web.php on line 6
+[04-Sep-2021 15:55:34 UTC] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Support\Facades\Auth' not found in /home/eurotouchdesigns/public_html/dealtamin/routes/web.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/eurotouchdesigns/public_html/dealtamin/routes/web.php on line 6

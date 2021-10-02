@@ -1,0 +1,4 @@
+[31-Aug-2021 14:55:55 UTC] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/eurotouchdesigns/public_html/dealtamin/app/Booking.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/eurotouchdesigns/public_html/dealtamin/app/Booking.php on line 11
