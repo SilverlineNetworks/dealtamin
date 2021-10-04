@@ -24,7 +24,9 @@ class Company extends Model
         'timezone',
         'currency_id',
         'locale',
-        'logo'
+        'logo',
+        'latitude',
+        'longitude'
     ];
 
     protected $appends = [

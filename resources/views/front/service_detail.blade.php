@@ -298,7 +298,8 @@
                         <?php endforeach; ?>
                     </div>
                     <div id="menu1" class="tab-pane fade">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d116238.2596900766!2d54.36041775359597!3d24.435320269314744!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5e67868171df35%3A0xe891e0f59cb756f7!2sAster%20Clinic%2C%20Khalidiya%2C%20Abu%20Dhabi!5e0!3m2!1sen!2sae!4v1624181601857!5m2!1sen!2sae" width="100%" height="300" style="border:0;"></iframe>
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d116238.2596900766!2d54.36041775359597!3d24.435320269314744!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5e67868171df35%3A0xe891e0f59cb756f7!2sAster%20Clinic%2C%20Khalidiya%2C%20Abu%20Dhabi!5e0!3m2!1sen!2sae!4v1624181601857!5m2!1sen!2sae" width="100%" height="300" style="border:0;display:none"></iframe>
+                        <iframe src="https://www.google.com/maps/embed/v1/view?key=YOUR_API_KEY&center={{$service->company->latitude}},{{$service->company->longitude}}&zoom=18&maptype=roadmap" width="100%" height="300" style="border:0;"></iframe>
                     </div>
                     <div id="menu2" class="tab-pane fade">
                         <form class="contact-form" id="contact_form" method="post" action="">
