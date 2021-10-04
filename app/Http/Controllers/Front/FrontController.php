@@ -1789,7 +1789,7 @@ class FrontController extends FrontBaseController
         $company = Company::where(['company_email' => Crypt::decryptString($request->email), 'verified' => 'no', 'status' => 'inactive'])->firstOrFail();
 
         $company->verified = 'yes';
-        $company->status = 'active';
+        $company->status = 'no';
         $company->save();
 
         $company = User::with('company')->where('email', Crypt::decryptString($request->email))->first();

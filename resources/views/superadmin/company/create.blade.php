@@ -145,6 +145,18 @@
                         </select>
                      </div>
                   </div>
+
+                  <div class="col-md-12">
+                      <div class="form-group">
+                          <label for="location" class="control-label">@lang('app.location')</label>
+                          <input type="text" class="form-control form-control-lg" id="location" name="location"
+                          value="">
+                          <input type="hidden" id="lat" name="latitude" value="9.981636"/>
+                          <input type="hidden" id="lng" name="longitude" value="76.299881"/>
+                      </div>
+                  </div>
+
+
                </div>
                <hr>
                <h5>@lang('modules.company.employeeDetails')</h5>
@@ -194,7 +206,24 @@
 @endsection
 
 @push('footer-js')
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&key="></script>
     <script>
+
+        google.maps.event.addDomListener(window, 'load', function () {
+            var places = new google.maps.places.Autocomplete(document.getElementById('location'));
+            google.maps.event.addListener(places, 'place_changed', function () {
+                var place = places.getPlace();
+                var address = place.formatted_address;
+                var latitude = place.geometry.location.A;
+                var longitude = place.geometry.location.F;
+                var mesg = "Address: " + address;
+                mesg += "\nLatitude: " + latitude;
+                mesg += "\nLongitude: " + longitude;
+                document.getElementById('lat').value = latitude;
+                document.getElementById('lng').value = longitude;
+            });
+        });
+        
         $('.dropify').dropify({
             messages: {
                 default: '@lang("app.dragDrop")',
