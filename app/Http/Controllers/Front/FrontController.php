@@ -48,9 +48,11 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
+use App\Reviews;
 
 class FrontController extends FrontBaseController
 {
@@ -735,6 +737,7 @@ class FrontController extends FrontBaseController
         ->get();
 
         $products = json_decode($request->cookie('products'), true) ?: [];
+        $ids = [];
 
         $reqProduct = array_filter($products, function ($product) use ($service) {
             return $product['unique_id'] == 'service'.$service->id;
@@ -742,12 +745,24 @@ class FrontController extends FrontBaseController
 
         $reqSubProduct = array_filter($products, function ($product) use ($sub_services) {
             foreach ($sub_services as $sb) {
+                $ids[] = $sb->id;
                 return $product['unique_id'] == $sb->id;
             }
         });
 
+        $ids[] = $service_id;
+        foreach ($sub_services as $sb) {
+            //$ids[] = $sb->id;
+        }
+
+        $reviews = DB::table('service_reviews')
+            ->join('users', 'users.id', '=', 'service_reviews.user_id')
+            ->whereIn('service_reviews.service_id', $ids)
+            ->select('service_reviews.*', 'users.name', 'users.image')
+            ->get();
+
         if($service){
-            return view('front.service_detail', compact('service', 'reqProduct', 'sub_services', 'reqSubProduct'));
+            return view('front.service_detail', compact('service', 'reqProduct', 'sub_services', 'reqSubProduct', 'reviews'));
         }
         abort(404);
     }
@@ -1782,6 +1797,57 @@ class FrontController extends FrontBaseController
             return Reply::success(__('email.verificationLinkSent'));
         }
 
+    }
+
+    public function review(Request $request) {
+        //echo decrypt($request->id);
+        $id = Crypt::decryptString($request->id);
+        $booking = Booking::where('id', $id)
+        ->with([
+            'payment' => function($q) { $q->withoutGlobalScope('company'); },
+            'user' => function($q) { $q->withoutGlobalScope('company'); },
+            ])
+            ->first();
+        $booking_items = BookingItem::where('booking_id', $id)->get();
+
+        foreach ($booking_items as $items) {
+            $services[] = BusinessService::select('id', 'name')->where('id', $items->business_service_id)->first();
+        }
+
+        $count = Reviews::where('booking_id',$id)->count();
+
+        return view('front.review', compact('booking', 'booking_items', 'services', 'id', 'count'));
+    }
+
+    public function reviewUpdate(Request $request) {
+        $id = $request->id;
+        $rating = $request->rating;
+        $review_comments = $request->review_comments;
+        $count = Reviews::where('booking_id',$id)->count();
+
+        if ($count > 0) {
+            return Reply::redirect(route('front.services', 'all'), 'Already submitted the review');
+        }
+
+        $booking = Booking::where('id', $id)
+        ->with([
+            'payment' => function($q) { $q->withoutGlobalScope('company'); },
+            'user' => function($q) { $q->withoutGlobalScope('company'); },
+            ])
+            ->first();
+        $booking_items = BookingItem::where('booking_id', $id)->get();
+
+        foreach ($booking_items as $items) {
+            Reviews::insert([
+                'service_id' => $items->business_service_id,
+                'user_id' => $booking->user->id,
+                'message' => $review_comments,
+                'ratings' => (int) $rating,
+                'booking_id' => $id
+            ]);
+        }
+
+        return Reply::redirect(route('front.services', 'all'), 'Successfully submitted your review');
     }
 
     public function confirmEmail(Request $request)

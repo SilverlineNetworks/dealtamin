@@ -1,6 +1,88 @@
 @extends('layouts.master')
 
 @section('content')
+
+    <style type="text/css">
+    #description {
+      font-family: Roboto;
+      font-size: 15px;
+      font-weight: 300;
+    }
+
+    #infowindow-content .title {
+      font-weight: bold;
+    }
+
+    #infowindow-content {
+      display: none;
+    }
+
+    #map #infowindow-content {
+      display: inline;
+    }
+
+    .pac-card {
+      background-color: #fff;
+      border: 0;
+      border-radius: 2px;
+      box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+      margin: 10px;
+      padding: 0 0.5em;
+      font: 400 18px Roboto, Arial, sans-serif;
+      overflow: hidden;
+      font-family: Roboto;
+      padding: 0;
+    }
+
+    #pac-container {
+      padding-bottom: 12px;
+      margin-right: 12px;
+    }
+
+    .pac-controls {
+      display: inline-block;
+      padding: 5px 11px;
+    }
+
+    .pac-controls label {
+      font-family: Roboto;
+      font-size: 13px;
+      font-weight: 300;
+    }
+
+    #pac-input {
+      background-color: #fff;
+      font-family: Roboto;
+      font-size: 15px;
+      font-weight: 300;
+      margin-left: 12px;
+      padding: 0 11px 0 13px;
+      text-overflow: ellipsis;
+      width: 400px;
+    }
+
+    #pac-input:focus {
+      border-color: #4d90fe;
+    }
+
+    #title {
+      color: #fff;
+      background-color: #4d90fe;
+      font-size: 25px;
+      font-weight: 500;
+      padding: 6px 12px;
+    }
+
+    #target {
+      width: 345px;
+    }
+
+    #map {
+        height: 400px !important;
+    }
+    </style>
+
+
     <div class="row">
     <div class="col-md-12">
         <div class="card card-dark">
@@ -165,10 +247,25 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="location" class="control-label">@lang('app.location')</label>
-                            <input type="text" class="form-control form-control-lg" id="location" name="location"
-                            value="{{$company->location}}">
-                            <input type="hidden" id="lat" name="latitude" value="9.981636"/>
-                            <input type="hidden" id="lng" name="longitude" value="76.299881"/>
+                            <input type="hidden" class="form-control form-control-lg" id="location" name="location"
+                            value="___">
+                            <input type="hidden" id="lat" name="latitude" value="{{$company->latitude}}"/>
+                            <input type="hidden" id="lng" name="longitude" value="{{$company->longitude}}"/>
+                        </div>
+
+                        <div>
+                          <input
+                            id="pac-input"
+                            class="controls"
+                            type="text"
+                            placeholder="Enter a location"
+                          />
+                        </div>
+                        <div id="map"></div>
+                        <div id="infowindow-content">
+                          <span id="place-name" class="title"></span><br />
+                          <strong>Place ID</strong>: <span id="place-id"></span><br />
+                          <span id="place-address"></span>
                         </div>
                     </div>
 
@@ -192,23 +289,124 @@
 @endsection
 
 @push('footer-js')
-    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&key="></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB8z669FCD9gRnRPuD81MLdATevU2jFqwY&callback=initAutocomplete&libraries=places&v=weekly" async></script>
     <script>
 
-        google.maps.event.addDomListener(window, 'load', function () {
-            var places = new google.maps.places.Autocomplete(document.getElementById('location'));
-            google.maps.event.addListener(places, 'place_changed', function () {
-                var place = places.getPlace();
-                var address = place.formatted_address;
-                var latitude = place.geometry.location.A;
-                var longitude = place.geometry.location.F;
-                var mesg = "Address: " + address;
-                mesg += "\nLatitude: " + latitude;
-                mesg += "\nLongitude: " + longitude;
-                document.getElementById('lat').value = latitude;
-                document.getElementById('lng').value = longitude;
-            });
+    let markers = [];
+    var marker = null;
+
+    function handleEvent(event) {
+        document.getElementById('lat').value = event.latLng.lat();
+        document.getElementById('lng').value = event.latLng.lng();
+    }
+
+    function initAutocomplete() {
+        const map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: {{$company->latitude}}, lng: {{$company->longitude}} },
+            zoom: 13,
+            mapTypeId: "roadmap",
         });
+        // Create the search box and link it to the UI element.
+        const input = document.getElementById("pac-input");
+        const searchBox = new google.maps.places.SearchBox(input);
+
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+        // Bias the SearchBox results towards current map's viewport.
+        map.addListener("bounds_changed", () => {
+            searchBox.setBounds(map.getBounds());
+        });
+
+        const myLatLng = { lat: {{$company->latitude}}, lng: {{$company->longitude}} };
+        marker = new google.maps.Marker({
+            map,
+            title: "",
+            position: myLatLng,
+            draggable: true
+        })
+
+        marker.addListener('drag', handleEvent);
+        marker.addListener('dragend', handleEvent);
+
+        // Listen for the event fired when the user selects a prediction and retrieve
+        // more details for that place.
+
+        /*google.maps.event.addListener(map, "click", function(evt) {
+                //initialService.textSearch(request, callback);
+                markers.forEach((marker) => {
+                    marker.setMap(null);
+                });
+                markers = [];
+
+                const myLatLng = { lat: evt.latLng.lat(), lng: evt.latLng.lng() };
+                new google.maps.Marker({
+                    position: myLatLng,
+                    map,
+                    title: "",
+                });
+        });*/
+
+        searchBox.addListener("places_changed", () => {
+            const places = searchBox.getPlaces();
+            if (places.length == 0) {
+                return;
+            }
+
+            // Clear out the old markers.
+            markers.forEach((marker) => {
+                marker.setMap(null);
+            });
+            markers = [];
+            if (marker != null)
+                marker.setMap(null);
+
+            // For each place, get the icon, name and location.
+            const bounds = new google.maps.LatLngBounds();
+
+            places.forEach((place) => {
+                if (!place.geometry || !place.geometry.location) {
+                    console.log("Returned place contains no geometry");
+                    return;
+            }
+
+            document.getElementById('lat').value = place.geometry.location.lat();
+            document.getElementById('lng').value = place.geometry.location.lng();
+
+            const icon = {
+                url: place.icon,
+                size: new google.maps.Size(71, 71),
+                origin: new google.maps.Point(0, 0),
+                anchor: new google.maps.Point(17, 34),
+                scaledSize: new google.maps.Size(25, 25),
+            };
+
+
+
+            // Create a marker for each place.
+            markers.push(
+
+            );
+
+            marker = new google.maps.Marker({
+                map,
+                icon,
+                title: place.name,
+                position: place.geometry.location,
+                draggable: true
+            })
+
+            marker.addListener('drag', handleEvent);
+            marker.addListener('dragend', handleEvent);
+
+            if (place.geometry.viewport) {
+            // Only geocodes have viewport.
+                bounds.union(place.geometry.viewport);
+            } else {
+                bounds.extend(place.geometry.location);
+            }
+            });
+                map.fitBounds(bounds);
+        });
+    }
 
         $('.dropify').dropify({
                 messages: {

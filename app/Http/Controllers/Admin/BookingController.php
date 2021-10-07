@@ -23,6 +23,8 @@ use App\Http\Requests\Booking\UpdateBooking;
 use App\Payment;
 use App\PaymentGatewayCredentials;
 use App\Product;
+use Illuminate\Support\Facades\Crypt;
+use Mail;
 
 class BookingController extends AdminBaseController
 {
@@ -352,6 +354,31 @@ class BookingController extends AdminBaseController
         $booking->payment_status = $payment_status;
 
         $booking->save();
+        $company_id = $booking->company_id;
+        $company = DB::Table('companies')->where('id', $company_id)->first();
+
+        /*SEND REVIEW MAIL BOOKING EMAIL */
+        //$request->status
+
+        if ($request->status === 'completed') {
+            $data = array(
+                'name'=> $booking->user->name,
+                'id' => Crypt::encryptString($id),
+                'booking_id' => $id,
+                'booking_date' => $booking->date_time,
+                'vendor_name' => $company->company_name,
+                'company_phone' => $company->company_phone
+            );
+
+            $to_name = $booking->user->name;
+            $to_email = $booking->user->email;
+
+            Mail::send('emails.booking_completed', $data, function($message) use ($to_name,$to_email, $id, $company) {
+                $message->to($to_email, $to_name)->subject('Thank You! Your Booking Is Completed (Booking Number #: '.$id.')');
+                $message->from($company->company_email,$company->company_name);
+            });
+        }
+
 
         /* assign employees to this appointment */
         if(!empty($employees))

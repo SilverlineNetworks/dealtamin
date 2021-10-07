@@ -250,6 +250,9 @@ Route::group(['namespace' => 'Front', 'as' => 'front.'], function () {
     Route::get('/pricing', ['uses' => 'FrontController@pricing'])->name('pricing');
 
     Route::get('confirm/{email}', 'FrontController@confirmEmail')->name('confirm');
+    Route::post('review/{id}', 'FrontController@reviewUpdate')->name('review.update');
+    Route::get('review/{id}', 'FrontController@review')->name('review');
+    //Route::post('reviews/update', 'FrontController@reviewUpdate')->name('review.update');
 
     Route::get('/', ['uses' => 'FrontController@index'])->name('index');
     Route::get('/register', ['uses' => 'FrontController@register'])->name('register');

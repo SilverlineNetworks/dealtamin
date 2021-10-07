@@ -119,7 +119,7 @@
                                 <div>
                                     <span style="text-transform: capitalize;font-size: 14px;color: #3b3b3b;">Booking Date</span>
                                 </div>
-                                <input min="<?=date('Y-m-d', time());?>" type="date" id="booking_date" class="form-control" data-date-format="YYYY MMMM DD" style="border:1px solid #ced4da"/>
+                                <input min="<?=date('Y-m-d', time());?>" type="date" name="booking_date" id="booking_date" class="form-control" data-date-format="YYYY MMMM DD" style="border:1px solid #ced4da"/>
                             </div>
 
                             <div class="mx-3 mt-4">
@@ -230,7 +230,7 @@
                     </div>
                 </div>
                 <div class="col-5">
-                    <input min="<?=date('Y-m-d', time());?>" type="date" id="booking_date" class="form-control" data-date-format="YYYY MMMM DD" style="border:solid 10px #efefef"/><div class="mx-auto" ></div>
+                    <input min="<?=date('Y-m-d', time());?>" type="date" id="booking_datesss" class="form-control" data-date-format="YYYY MMMM DD" style="border:solid 10px #efefef"/><div class="mx-auto" ></div>
                 </div>
                 <div class="col-7">
                     <div class="dropdown" style="border:solid 10px #efefef;border-top-right-radius: 30px;padding-top: 5px;padding-bottom: 5px;padding-left: 10px;border-bottom-right-radius: 30px;">
@@ -241,7 +241,7 @@
                           <div class="container">
                             <div class="row">
                                 <div style="width:100%;">
-                                    <input type="hidden" id="booking_dated" name="booking_date">
+                                    <input type="hidden" id="booking_dated" name="booking_dated">
                                     <div class="slots-wrapper" style="display:none"></div>
                                 </div>
                             </div>
@@ -276,6 +276,9 @@
     <script>
         $("#booking_date").val('<?=date('Y-m-d', time());?>');
         $('#select-id').html('<?=date('Y-m-d', time());?>');
+        var bookingDetails = {
+            bookingDate : '<?=date('Y-m-d', time());?>'
+        }
 
         $(function () {
 
@@ -781,6 +784,8 @@
 
         $('body').on('click', '.add-booking-details', function() {
             bookingDetails.selected_user = $('#selected_user').val();
+            bookingDetails.bookingDate = $('#booking_date').val();
+
             $.easyAjax({
                 url: '{{ route('front.addBookingDetails') }}',
                 type: 'POST',
