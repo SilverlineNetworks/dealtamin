@@ -286,6 +286,15 @@
         <!-- /.card -->
     </div>
     </div>
+    <?php
+        if (empty($company->latitude)) {
+            $company->latitude = 0;
+        }
+
+        if (empty($company->longitude)) {
+            $company->longitude = 0;
+        }
+    ?>
 @endsection
 
 @push('footer-js')

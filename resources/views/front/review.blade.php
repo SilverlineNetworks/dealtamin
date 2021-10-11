@@ -152,7 +152,7 @@
                         </ul>
                     </div>
                 </section>
-                <textarea id="review_comments" name="review_comments" style="margin-top:40px;height: 111px;" class="form-control" placeholder="Share details of your own experience at thi place.."></textarea>
+                <textarea id="review_comments" name="review_comments" style="margin-top:40px;height: 111px;" class="form-control" placeholder="Share details of your own experience at this place.."></textarea>
                 <input type="hidden" name="id" id="id" value="{{$id}}"/>
                 <input type="hidden" name="rating" id="rating" value="0"/>
 

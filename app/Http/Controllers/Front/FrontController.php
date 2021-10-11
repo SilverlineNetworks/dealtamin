@@ -752,7 +752,7 @@ class FrontController extends FrontBaseController
 
         $ids[] = $service_id;
         foreach ($sub_services as $sb) {
-            //$ids[] = $sb->id;
+            $ids[] = $sb->id;
         }
 
         $reviews = DB::table('service_reviews')
