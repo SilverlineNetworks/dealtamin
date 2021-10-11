@@ -313,7 +313,18 @@
                             <div style="flex-grow: 1">
                                 <div style="display:flex;flex-direction:row;">
                                     <div>
-                                        <img src="{{ asset('user-uploads/avatar/'.$review->image) }}" alt="Image" class="ravatar"/>
+                                        <?php
+                                            if (!empty($review->image)) {
+                                                ?>
+                                                <img src="{{ asset('user-uploads/avatar/'.$review->image) }}" alt="Image" class="ravatar"/>
+                                                <?php
+                                            }
+                                            else {
+                                                ?>
+                                                <img src="{{ asset('user-uploads/avatar/user.png') }}" alt="Image" class="ravatar"/>
+                                                <?php
+                                            }
+                                        ?>
                                     </div>
                                     <div style="margin-left:20px;font-weight:bold">
                                         {{$review->name}} <br/>
