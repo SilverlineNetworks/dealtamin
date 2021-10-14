@@ -53,6 +53,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
 use App\Reviews;
+use Mail;
 
 class FrontController extends FrontBaseController
 {
@@ -60,6 +61,40 @@ class FrontController extends FrontBaseController
     {
         parent::__construct();
 
+    }
+
+    public function mainTest() {
+        /*
+        $data = array(
+            'name'=> $booking->user->name,
+            'id' => Crypt::encryptString($id),
+            'booking_id' => $id,
+            'booking_date' => $booking->date_time,
+            'vendor_name' => $company->company_name,
+            'company_phone' => $company->company_phone
+        );
+
+        $to_name = $booking->user->name;
+        $to_email = $booking->user->email;
+
+        Mail::send('emails.booking_completed', $data, function($message) use ($to_name,$to_email, $id, $company) {
+            $message->to($to_email, $to_name)->subject('Thank You! Your Booking Is Completed (Booking Number #: '.$id.')');
+            $message->from($company->company_email,$company->company_name);
+        });
+        */
+        $data = array(
+        );
+
+        $id = 1;
+        $to_name = 'jobin dcruz';
+        $to_email = 'info.voxunico@gmail.com';
+        $company = '';
+
+        Mail::send('emails.booking_confirmation_new', $data, function($message) use ($to_name,$to_email, $id, $company) {
+            $message->to($to_email, $to_name)->subject(__('email.bookingConfirmation.subject').' '.config('app.name').'!');
+            $message->from('info.voxunico@gmail.com','test');
+        });
+        return view('emails.booking_confirmation_new');
     }
 
     public function index()
@@ -262,6 +297,14 @@ class FrontController extends FrontBaseController
             $bookingDetails = json_decode($request->cookie('bookingDetails'), true);
         }
 
+        if(!is_null(json_decode($request->cookie('products'), true))) {
+            foreach($products AS $k=>$v) {
+                $service_id = $v['unique_id'];
+                $tax_details = DB::Table('business_services')->select('tax_type', 'tax_percentage')->where('id', $service_id)->first();
+                $products[$k]['tax_type'] = $tax_details->tax_type;
+                $products[$k]['tax_percentage'] = $tax_details->tax_percentage;
+            }
+        }
 
         return view('front.cart', compact('commission', 'products', 'bookingDetails', 'tax', 'couponData', 'type', 'locale', 'bookingDetails'));
     }
@@ -324,8 +367,20 @@ class FrontController extends FrontBaseController
 
         $tax = TaxSetting::active()->first();
 
+        //NEW TAX CALCULATION
+        if ($request_type !== 'deal') {
+            foreach ($products as $key => $value) {
+                $service_id = $value->unique_id;
+                $tax_details = DB::Table('business_services')->select('tax_type', 'tax_percentage')->where('id', $service_id)->first();
+
+                if ($tax_details->tax_type == 1 && !empty($tax_details->tax_percentage)) {
+                    $totalAmount += ($tax_details->tax_percentage / 100) * $totalAmount;
+                }
+            }
+        }
+
         if ($tax && $request_type !== 'deal') {
-            $totalAmount += ($tax->percent / 100) * $totalAmount;
+            //$totalAmount += ($tax->percent / 100) * $totalAmount;
         }
 
         if ($couponData) {
@@ -427,9 +482,56 @@ class FrontController extends FrontBaseController
         $booking->payment_status = 'pending';
         $booking->save();
 
+        //FETCH BOOKING ITEMS
+        $booking->services = DB::table('booking_items')
+            ->join('business_services', 'business_services.id', '=', 'booking_items.business_service_id')
+            ->select('business_services.*')
+            ->where('booking_items.booking_id', $booking->id)
+            ->get();
+
         $admins = User::allAdministrators()->where('company_id', $booking->company_id)->first();
         Notification::send($admins, new NewBooking($booking));
-        $booking->user->notify(new BookingConfirmation($booking));
+        //$booking->user->notify(new BookingConfirmation($booking));
+
+        $company_id = $booking->company_id;
+        $company = DB::Table('companies')->where('id', $company_id)->first();
+
+        $data = array(
+            'name' => $booking->user->name,
+            'booking_id' => $booking->id,
+            'booking_date' => $booking->date_time->isoFormat('DD MMMM, YYYY - hh:mm A'),
+            'payment_method' => $booking->payment_gateway,
+            'booking' => $booking,
+            'vendor_name' => $company->company_name
+        );
+
+        $to_name = $booking->user->name;
+        $to_email = $booking->user->email;
+
+
+        $id = $booking->id;
+        Mail::send('emails.booking_confirmation_new', $data, function($message) use ($to_name,$to_email, $id, $company) {
+            $message->to($to_email, $to_name)->subject(__('email.bookingConfirmation.subject').' '.config('app.name').'!');
+            $message->from($company->company_email,$company->company_name);
+        });
+        /*
+        $data = array(
+            'name'=> $booking->user->name,
+            'id' => Crypt::encryptString($id),
+            'booking_id' => $id,
+            'booking_date' => $booking->date_time,
+            'vendor_name' => $company->company_name,
+            'company_phone' => $company->company_phone
+        );
+
+        $to_name = $booking->user->name;
+        $to_email = $booking->user->email;
+
+        Mail::send('emails.booking_completed', $data, function($message) use ($to_name,$to_email, $id, $company) {
+            $message->to($to_email, $to_name)->subject('Thank You! Your Booking Is Completed (Booking Number #: '.$id.')');
+            $message->from($company->company_email,$company->company_name);
+        });
+        */
 
         if ($return_url != null && $return_url = 'backend') {
 
@@ -579,11 +681,18 @@ class FrontController extends FrontBaseController
             $originalAmount = ($originalAmount + $amount);
 
             $companyId = $product['companyId'];
+
+            $service_id = $product['unique_id'];
+            $tax_details = DB::Table('business_services')->select('tax_type', 'tax_percentage')->where('id', $service_id)->first();
+
+            if ($tax_details->tax_type == 1 && !empty($tax_details->tax_percentage)) {
+                $taxAmount += ($tax_details->tax_percentage / 100) * $originalAmount;
+            }
         }
 
-        if (!is_null($tax) && $tax->percent > 0 && $type!=='deal') {
+        /*if (!is_null($tax) && $tax->percent > 0 && $type!=='deal') {
             $taxAmount = (($tax->percent / 100) * $originalAmount);
-        }
+        }*/
 
         $amountToPay = ($originalAmount + $taxAmount);
 

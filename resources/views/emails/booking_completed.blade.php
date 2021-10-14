@@ -4,7 +4,18 @@
       <meta charset="UTF-8">
       <title>Your Booking is Completed</title>
       <style type="text/css">
-          body{width:100% !important;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;margin:0;padding:0;background-color:#319fb5;}
+      body{
+          width:100% !important;
+          -webkit-text-size-adjust:100%;
+          -ms-text-size-adjust:100%;
+          margin:0 auto;
+          padding:0;
+          background-color:#e3e3e3;
+          text-align: center;
+          align-items: center;
+          display: flex;
+          justify-content: center;
+      }
           * {-webkit-font-smoothing:antialiased}
           .ExternalClass * {line-height:100%}
           table td {border-collapse:collapse; max-width:100% !important; word-break:break-word; -webkit-hyphens:auto; -moz-hyphens:auto; hyphens:auto; overflow:auto; white-space:normal;}
@@ -15,6 +26,9 @@
               .t-center-txt {text-align:center}
               .t-width {width:100% !important;max-width:100% !important;display:table !important}
           }
+          img {
+              width: 200px;
+          }
       </style>
     </head>
 
@@ -22,29 +36,32 @@
         <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
             Your Booking is Completed
         </div>
-        <div>
+        <div style="padding:10px;width: 60%;background-color:#fff; text-align:left">
+            <div style="text-align:center">
+                <img src="{{asset('user-uploads/logo/1ce0be83858744699542be0e4daf93e2.png')}}" class="logo" alt="Laravel Logo">
+            </div>
         <table width="100%">
             <tr>
                 <td>Hi {{ $name }}</td>
             </tr>
             <tr>
                 <td>
-                    <div>Thank you for choosing {{$vendor_name}}. We appreciate your business.</div>
+                    <div style="margin-top:10px;margin-bottom:10px;">Thank you for choosing {{$vendor_name}}. We appreciate your business.</div>
 
-                    <table>
+                    <table style="width:60%">
                         <tr>
                             <td colspan="2">Here are your booking details:</td>
                         </tr>
                         <tr>
-                            <td>Booking Number</td>
+                            <td style="color:#109191;">Booking Number</td>
                             <td>{{$booking_id}}</td>
                         </tr>
                         <tr>
-                            <td>Booking Date and Time</td>
+                            <td style="color:#109191;">Booking Date and Time</td>
                             <td>{{$booking_date}}</td>
                         </tr>
                         <tr>
-                            <td>Booking Status</td>
+                            <td style="color:#109191;">Booking Status</td>
                             <td>Completed</td>
                         </tr>
                     </table>

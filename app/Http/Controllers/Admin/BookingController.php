@@ -269,7 +269,7 @@ class BookingController extends AdminBaseController
 
         $originalAmount = 0;
         $bookingItems = array();
-
+        $taxAmount = 0;
         /* save services and deals */
         if(!is_null($services))
         {
@@ -289,8 +289,15 @@ class BookingController extends AdminBaseController
                 ];
 
                 $originalAmount = ($originalAmount + $amount);
+                $tax_details = DB::Table('business_services')->select('tax_type', 'tax_percentage')->where('id', $service_id)->first();
+
+                if ($tax_details->tax_type == 1 && !empty($tax_details->tax_percentage)) {
+                    $taxAmount += ($tax_details->tax_percentage / 100) * $amount;
+                }
             }
         }
+
+
 
         /* save products */
         if(!is_null($products))
@@ -318,7 +325,7 @@ class BookingController extends AdminBaseController
             ])
             ->first();
 
-        $taxAmount = 0;
+
 
         if($discount > 0){
             if($discount > 100) $discount = 100;
@@ -328,8 +335,8 @@ class BookingController extends AdminBaseController
         }
 
         if($booking->tax_name){
-            $taxAmount = $amountToPay * $booking->tax_percent / 100;
-            $booking->tax_amount = $taxAmount;
+            //$taxAmount = $amountToPay * $booking->tax_percent / 100;
+            //$booking->tax_amount = $taxAmount;
         }
 
         $amountToPay = ($amountToPay + $taxAmount);

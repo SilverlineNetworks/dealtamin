@@ -30,6 +30,8 @@ class ShowDashboard extends AdminBaseController
      */
     public function __invoke(Request $request)
     {
+        $show_recent_employee = 1;
+
         if(\request()->ajax())
         {
             $startDate = Carbon::createFromFormat('Y-m-d', $request->startDate);
@@ -114,8 +116,7 @@ class ShowDashboard extends AdminBaseController
             }
             return Reply::dataOnly(['status' => 'success', 'totalBooking' => $totalBooking, 'pendingBooking' => $pendingBooking, 'approvedBooking' => $approvedBooking, 'inProgressBooking' => $inProgressBooking, 'completedBooking' => $completedBooking, 'canceledBooking' => $canceledBooking, 'offlineBooking' => $offlineBooking, 'onlineBooking' => $onlineBooking, 'totalCustomers' => $totalCustomers, 'totalEarnings' => round($totalEarnings, 2), 'user' => $this->user]);
         }
-
-        if($this->user->is_admin){
+        if($show_recent_employee){
             $recentSales = Booking::orderBy('id', 'desc')
             ->with(['user',
             'user'=> function($q)
@@ -132,6 +133,6 @@ class ShowDashboard extends AdminBaseController
 
         $todoItemsView = $this->generateTodoView();
 
-        return view('admin.dashboard.index', compact('recentSales', 'todoItemsView'));
+        return view('admin.dashboard.index', compact('recentSales', 'todoItemsView', 'show_recent_employee'));
     }
 }

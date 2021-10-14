@@ -227,6 +227,10 @@
                     <div id="invoiced_to">
                         <small>@lang("modules.booking.billedTo"):</small>
                         <h3 class="name">{{ ucwords($booking->user->name) }}</h3>
+                        <div>{{$booking->user->mobile}}</div>
+
+                        <h3 class="name">Payment Gateway</h3>
+                        <div>{{$booking->payment_gateway}}</div>
                     </div>
                 </td>
                 <td>

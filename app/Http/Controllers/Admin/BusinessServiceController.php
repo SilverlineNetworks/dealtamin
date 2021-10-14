@@ -268,6 +268,8 @@ class BusinessServiceController extends AdminBaseController
         $service->status = $request->status;
         $service->slug = $request->slug;
         $service->parent_id = (int) $request->parent_id;
+        $service->tax_type = (int) $request->tax_type;
+        $service->tax_percentage = (float) isset($request->tax_percentage) ? $request->tax_percentage : 0;
         $service->save();
 
         $employee_ids = $request->employee_ids;

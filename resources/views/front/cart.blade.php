@@ -77,7 +77,7 @@
                                             </td>
 
                                             <td class="sub-total rupee">
-                                                {{ $settings->currency->currency_symbol }}<span>{{ $product['quantity'] * $product['price'] }}</span>
+                                                {{ $settings->currency->currency_symbol }}<span data-taxtype={{$product['tax_type']}} data-taxpercentage={{$product['tax_percentage']}}>{{ $product['quantity'] * $product['price'] }}</span>
                                             </td>
                                             <td>
                                                 <a title="@lang('front.table.deleteProduct')" href="javascript:;" data-key="{{ $key }}" class="delete-item delete-btn">
@@ -185,7 +185,7 @@
                                         @if(!is_null($tax) && !is_null($products))
                                             <li class="couponDiscountBox">
                                                 <span>
-                                                    {{ $tax->tax_name }} ({{ $tax->percent }}%):
+                                                    {{ $tax->tax_name }}:
                                                 </span>
                                                 <span id="tax" class="rupee">
                                                 </span>
@@ -417,17 +417,23 @@
 
         function calculateTotal() {
             let cartTotal = tax = totalAmount = 0.00;
+            let taxType = 2;
+            let taxPercentage = 0;
 
             $('.sub-total>span').each(function () {
                 cartTotal += parseFloat($(this).text());
+                taxType = $(this).data('taxtype');
+                taxPercentage = $(this).data('taxpercentage');
             });
 
             $('#sub-total').text('{{ $settings->currency->currency_symbol }}'+cartTotal.toFixed(2));
 
             // calculate and display tax
-            @if(!is_null($tax) && $type=='booking')
-                let taxPercent = parseFloat('{{ $tax->percent }}');
-                tax = (taxPercent * cartTotal)/100;
+            @if($type=='booking')
+                if (taxType == 1) {
+                    let taxPercent = parseFloat(taxPercentage);
+                    tax = (taxPercent * cartTotal)/100;
+                }
 
                 $('#tax').text('{{ $settings->currency->currency_symbol }}'+tax.toFixed(2));
             @endif

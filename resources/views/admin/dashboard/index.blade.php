@@ -202,7 +202,7 @@
             </div>
 
             <div class="row">
-                @if($user->is_admin)
+                @if($user->is_admin == 1 || $show_recent_employee == 1)
                     <div class="col-md-12 mb-5">
                         <div class="card">
                             <div class="card-header">

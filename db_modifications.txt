@@ -1,3 +1,22 @@
+
+
+
+ALTER TABLE `business_services` ADD `tax_type` INT(11) NOT NULL DEFAULT '2' AFTER `time`, ADD `tax_percentage` FLOAT NOT NULL DEFAULT '0' AFTER `tax_type`; 
+
+
+
+
+
+
+
+
+
+
+
+
+---OLD----
+
+
 CREATE TABLE `service_reviews` (
   `id` int(11) NOT NULL,
   `service_id` int(11) NOT NULL,
@@ -30,5 +49,5 @@ ALTER TABLE `service_reviews`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
-ALTER TABLE `service_reviews` ADD `booking_id` BIGINT(20) NOT NULL DEFAULT '0' AFTER `user_id`; 
-ALTER TABLE `service_reviews` CHANGE `created_at` `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP; 
+ALTER TABLE `service_reviews` ADD `booking_id` BIGINT(20) NOT NULL DEFAULT '0' AFTER `user_id`;
+ALTER TABLE `service_reviews` CHANGE `created_at` `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP;

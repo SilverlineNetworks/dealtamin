@@ -114,6 +114,22 @@
 
                             <div class="col-md-6">
                                 <div class="form-group">
+                                    <label>Tax Type</label>
+                                    <select class="form-control form-control-lg" name="tax_type" id="tax_type">
+                                        <option value="1">Exclude Tax</option>
+                                        <option value="2">Include Tax</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 tax_percentage">
+                                <div class="form-group">
+                                    <label>Tax Percentage</label>
+                                    <input type="text" name="tax_percentage" id="tax_percentage" value="0" class="form-control form-control-lg" autocomplete="off">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
                                     <label>@lang('app.location')</label>
                                     <div class="input-group">
                                         <select name="location_id" id="location_id" class="form-control form-control-lg">
@@ -194,11 +210,11 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-12">
+                            <div class="col-md-12" title="Click here to upload new image">
                                 <button type="button" class="btn btn-block btn-outline-info btn-sm col-md-2 select-image-button" id="select-image-button"><i class="fa fa-upload"></i> @lang('app.selectFile')</button>
                                 <div id="file-upload-box" >
                                     <div class="row" id="file-dropzone">
-                                        <div class="col-md-12">
+                                        <div class="col-md-12" data-toggle="tooltip" data-placement="top" title="Click here to upload new image" title="Click here to upload new image">
                                             <div class="dropzone" id="file-upload-dropzone">
                                                 {{ csrf_field() }}
                                                 <div class="fallback">
@@ -234,6 +250,9 @@
 @push('footer-js')
     <script>
         $(function () {
+
+            $('[data-toggle="tooltip"]').tooltip();
+
             $('#description').summernote({
                 dialogsInBody: true,
                 height: 300,
@@ -298,6 +317,14 @@
 
         $('#slug').keyup(function(e) {
             createSlug($(this).val());
+        });
+
+        //VAT TYPE
+        $('body').on('change', '#tax_type', function () {
+            $('.tax_percentage').hide();
+            if ($(this).val() == 1) {
+                $('.tax_percentage').show();
+            }
         });
 
         $('body').on('click', '.time_type', function () {

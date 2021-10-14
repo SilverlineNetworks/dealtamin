@@ -247,6 +247,7 @@ Route::group(['middleware' => 'auth'], function () {
 
 // Front Routes
 Route::group(['namespace' => 'Front', 'as' => 'front.'], function () {
+    Route::get('/mail_test', ['uses' => 'FrontController@mainTest'])->name('mainTest');
     Route::get('/pricing', ['uses' => 'FrontController@pricing'])->name('pricing');
 
     Route::get('confirm/{email}', 'FrontController@confirmEmail')->name('confirm');
