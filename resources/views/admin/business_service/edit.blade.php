@@ -104,10 +104,10 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6 tax_percentage">
+                            <div class="col-md-6 tax_percentage hide">
                                 <div class="form-group">
                                     <label>Tax Percentage</label>
-                                    <input type="text" name="tax_percentage" id="tax_percentage" value="{{$businessService->tax_percentage}}" class="form-control form-control-lg" autocomplete="off">
+                                    <input type="text" name="tax_percentage" id="tax_percentage" value="0" class="form-control form-control-lg" autocomplete="off">
                                 </div>
                             </div>
 
@@ -191,6 +191,11 @@
 
                             <div class="col-md-12" title="Click here to upload new image">
                                 <button type="button" class="btn btn-block btn-outline-info btn-sm col-md-2 select-image-button" id="select-image-button"><i class="fa fa-upload"></i> @lang('app.selectFile')</button>
+                                <div id="imhint" style="margin-top:27px;position: absolute;z-index: 10;margin-left: 10px;width:100%;text-align:center;">
+                                    <img src="{{ asset('user-uploads/avatar/upload.png') }}" alt="Image" style="width:30px;"/>
+                                    <br/><span>Upload Files</span>
+                                </div>
+                                <b>Upload Image</b>
                                 <div id="file-upload-box" >
                                     <div class="row" id="file-dropzone">
                                         <div class="col-md-12" data-toggle="tooltip" data-placement="top" title="Click here to upload new image" title="Click here to upload new image">
@@ -243,6 +248,14 @@
     <script>
         $(function () {
              $('[data-toggle="tooltip"]').tooltip();
+
+            $( "#file-upload-box" ).hover(
+              function() {
+                  $("#imhint").show();
+              }, function() {
+                  $("#imhint").hide();
+              }
+            );
 
             <?php
                 if ($businessService->tax_type == 2) {

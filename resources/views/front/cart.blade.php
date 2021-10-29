@@ -37,8 +37,10 @@
                                 <tr>
                                     <th>@lang('front.table.headings.serviceName')</th>
                                     <th>@lang('front.table.headings.unitPrice')</th>
-                                    <th>@lang('front.table.headings.quantity')</th>
-                                    <th>@lang('front.table.headings.subTotal')</th>
+                                    <th>Amount</th>
+                                    <th>VAT</th>
+                                    <th style="display:none;">@lang('front.table.headings.quantity')</th>
+                                    <th>Total</th>
                                     @if (!is_null($products))
                                         <th>&nbsp;</th>
                                     @endif
@@ -51,7 +53,9 @@
                                             <td>{{ $product['name'] }}
                                             </td>
                                             <td class="rupee">{{ $settings->currency->currency_symbol.$product['price'] }}</td>
-                                            <td>
+                                            <td>{{$product['sub_price']}}</td>
+                                            <td>{{$product['vat']}} <br/>{{$product['vat_pr']}}</td>
+                                            <td style="display:none;">
                                                 <div></div>
                                                 <div class="qty-wrap">
                                                     <div class="value-button qty-elements decrease" value="Decrease Value"><i class="zmdi zmdi-minus"></i></div>
@@ -77,7 +81,7 @@
                                             </td>
 
                                             <td class="sub-total rupee">
-                                                {{ $settings->currency->currency_symbol }}<span data-taxtype={{$product['tax_type']}} data-taxpercentage={{$product['tax_percentage']}}>{{ $product['quantity'] * $product['price'] }}</span>
+                                                {{ $settings->currency->currency_symbol }}<span data-taxtype={{$product['tax_type']}} data-taxpercentage={{$product['tax_percentage']}}>{{ $product['quantity'] * $product['total'] }}</span>
                                             </td>
                                             <td>
                                                 <a title="@lang('front.table.deleteProduct')" href="javascript:;" data-key="{{ $key }}" class="delete-item delete-btn">
@@ -183,7 +187,7 @@
 
                                     @if($type == 'booking')
                                         @if(!is_null($tax) && !is_null($products))
-                                            <li class="couponDiscountBox">
+                                            <li class="couponDiscountBox" style="display: none">
                                                 <span>
                                                     {{ $tax->tax_name }}:
                                                 </span>
@@ -421,19 +425,33 @@
             let taxPercentage = 0;
 
             $('.sub-total>span').each(function () {
-                cartTotal += parseFloat($(this).text());
                 taxType = $(this).data('taxtype');
-                taxPercentage = $(this).data('taxpercentage');
+                taxPercentage = parseFloat('{{ $tax->percent }}');
+
+                if (taxType == 1) {
+                    cartTotal += parseFloat($(this).text());
+                    let taxPercent = parseFloat(taxPercentage);
+                    //tax += (taxPercent * parseFloat($(this).text()))/100;
+                }
+                else {
+                    /*var price_wo_tax = (100 * parseFloat($(this).text())) / (100 + taxPercentage);
+                    price_wo_tax = price_wo_tax.toFixed(2);
+                    var tx_amt = parseFloat($(this).text()) - price_wo_tax;
+                    tax = tax + tx_amt;*/
+
+                    //cartTotal = parseFloat(cartTotal.toFixed(2)) + parseFloat(price_wo_tax);
+                    cartTotal += parseFloat($(this).text());
+                }
             });
 
-            $('#sub-total').text('{{ $settings->currency->currency_symbol }}'+cartTotal.toFixed(2));
+            $('#sub-total').text('{{ $settings->currency->currency_symbol }}'+cartTotal);
 
             // calculate and display tax
             @if($type=='booking')
-                if (taxType == 1) {
+                /*if (taxType == 1) {
                     let taxPercent = parseFloat(taxPercentage);
                     tax = (taxPercent * cartTotal)/100;
-                }
+                }*/
 
                 $('#tax').text('{{ $settings->currency->currency_symbol }}'+tax.toFixed(2));
             @endif
@@ -452,7 +470,9 @@
                 }
             }
 
-            $('#total').text('{{ $settings->currency->currency_symbol }}'+totalAmount.toFixed(2));
+
+
+            $('#total').text('{{ $settings->currency->currency_symbol }}'+totalAmount);
         }
 
         $('body').on('click', '#remove-coupon', function() {

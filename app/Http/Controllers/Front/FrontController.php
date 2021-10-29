@@ -298,11 +298,32 @@ class FrontController extends FrontBaseController
         }
 
         if(!is_null(json_decode($request->cookie('products'), true))) {
+            $sub_total = $estimated_vat = $including_vat = 0;
             foreach($products AS $k=>$v) {
                 $service_id = $v['unique_id'];
                 $tax_details = DB::Table('business_services')->select('tax_type', 'tax_percentage')->where('id', $service_id)->first();
                 $products[$k]['tax_type'] = $tax_details->tax_type;
                 $products[$k]['tax_percentage'] = $tax_details->tax_percentage;
+
+
+                if ($tax_details->tax_type == 1 && !empty($tax->percent)) {
+                    $sub_total += round($products[$k]['price'],2);
+                    $vat = ($products[$k]['price'] * $tax->percent) / 100;
+                    $estimated_vat += $vat;
+                    $products[$k]['sub_price'] = $products[$k]['price'];
+                    $products[$k]['vat'] = $vat;
+                    $products[$k]['total'] = round($vat + $products[$k]['sub_price'],2);
+                    $products[$k]['vat_pr'] = '('.$tax->percent.'% )';
+                }
+                else {
+                    $without_vat = $products[$k]['price'] * 100 / (100 + $tax->percent);
+                    $products[$k]['sub_price'] = round($without_vat, 2);
+                    $sub_total += $without_vat;
+                    $including_vat += round($products[$k]['price'] - $without_vat,2);
+                    $products[$k]['vat'] = round($products[$k]['price'] - $without_vat,2);
+                    $products[$k]['total'] = round($products[$k]['vat'] + $without_vat,2);
+                    $products[$k]['vat_pr'] = '';
+                }
             }
         }
 
@@ -365,31 +386,49 @@ class FrontController extends FrontBaseController
             return $sum;
         }, 0);
 
-        $tax = TaxSetting::active()->first();
 
+
+        $tax = TaxSetting::active()->first();
+        $sub_total = 0;
+        $estimated_vat = 0;
+        $including_vat = 0;
         //NEW TAX CALCULATION
         if ($request_type !== 'deal') {
             foreach ($products as $key => $value) {
                 $service_id = $value->unique_id;
-                $tax_details = DB::Table('business_services')->select('tax_type', 'tax_percentage')->where('id', $service_id)->first();
+                $tax_details = DB::Table('business_services')->select('tax_type', 'tax_percentage', 'image')->where('id', $service_id)->first();
 
-                if ($tax_details->tax_type == 1 && !empty($tax_details->tax_percentage)) {
-                    $totalAmount += ($tax_details->tax_percentage / 100) * $totalAmount;
+                if ($tax_details->tax_type == 1 && !empty($tax->percent)) {
+                    $sub_total += round($products[$key]->price,2);
+                    $vat = ($products[$key]->price * $tax->percent) / 100;
+                    $estimated_vat += $vat;
+                    $products[$key]->sub_price = $products[$key]->price;
                 }
+                else {
+                    $without_vat = $products[$key]->price * 100 / (100 + $tax->percent);
+                    $products[$key]->sub_price = round($without_vat, 2);
+                    $sub_total += $without_vat;
+                    $including_vat += round($products[$key]->price - $without_vat,2);
+                }
+                $products[$key]->image = json_decode($tax_details->image);
             }
         }
 
         if ($tax && $request_type !== 'deal') {
-            //$totalAmount += ($tax->percent / 100) * $totalAmount;
+            $totalAmount = $totalAmount + $estimated_vat;
         }
+
+        $discount = 0;
 
         if ($couponData) {
             $totalAmount -= $couponData['applyAmount'];
+            $discount = $couponData['applyAmount'];
         }
 
-        $totalAmount = round($totalAmount, 2);
+        $sub_total = round($sub_total,2);
 
-        return view('front.checkout_page', compact('totalAmount', 'bookingDetails', 'request_type', 'emp_name'));
+        $totalAmount = round($totalAmount, 2);
+        return view('front.checkout_page', compact('discount', 'sub_total','totalAmount', 'bookingDetails', 'request_type', 'emp_name', 'estimated_vat', 'including_vat', 'products'));
     }
 
     public function paymentFail(Request $request, $bookingId = null)
@@ -685,8 +724,8 @@ class FrontController extends FrontBaseController
             $service_id = $product['unique_id'];
             $tax_details = DB::Table('business_services')->select('tax_type', 'tax_percentage')->where('id', $service_id)->first();
 
-            if ($tax_details->tax_type == 1 && !empty($tax_details->tax_percentage)) {
-                $taxAmount += ($tax_details->tax_percentage / 100) * $originalAmount;
+            if ($tax_details->tax_type == 1 && !empty($tax->percent && $type!=='deal')) {
+                $taxAmount += ($tax->percent / 100) * $originalAmount;
             }
         }
 
@@ -1433,6 +1472,7 @@ class FrontController extends FrontBaseController
 
         $users_on_fullday_leave = array();
         foreach($fullday_leave as $fullday_leaves) {
+            if (isset($fullday_leaves->employee->id))
                 $users_on_fullday_leave[] = $fullday_leaves->employee->id;
         }
 

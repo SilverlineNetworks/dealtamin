@@ -130,7 +130,7 @@
                     <div class="deal_detail_expiry_date">
                     </div>
                     <div class="form_with_buy_deal d-lg-flex d-md-flex d-block">
-                        <form class="mb-lg-0 mb-md-0 mb-4">
+                        <form class="mb-lg-0 mb-md-0 mb-4" style="display:none">
                             <div class="value-button" id="decrease" value="Decrease Value"><i class="zmdi zmdi-minus"></i></div>
 
                             @php $product = current($reqProduct); @endphp
@@ -197,7 +197,7 @@
                                         <span>@if($sub_service->discount > 0){{ $settings->currency->currency_symbol }}{{ $sub_service->price }}@endif</span></p>
                                 </div>
                                 <div class="form_with_buy_deal d-lg-flex d-md-flex d-block" style="margin-top:10px">
-                                    <form class="mb-lg-0 mb-md-0 mb-4">
+                                    <form class="mb-lg-0 mb-md-0 mb-4" style="display:none">
                                         @php $product = current($reqSubProduct); @endphp
 
                                         @php
@@ -231,7 +231,7 @@
                         </div><hr/>
                         <?php endforeach; ?>
                         <div class="cart_nav" style="width: 130px;float: right;">
-                        <a class="nav-link align-items-center d-flex" href="{{ route('front.cartPage') }}" style="border-radius:20px;"><i class="zmdi zmdi-ticket-star"></i>Check Out</a>
+                        <!--<a class="nav-link align-items-center d-flex" href="{{ route('front.cartPage') }}" style="border-radius:20px;display:none"><i class="zmdi zmdi-ticket-star"></i>Check Out</a>-->
                     </div>
                         <?php /*foreach ($sub_services as $sub_service): ?>
                             <h4 style="margin:0;margin-top:20px;margin-bottom:20px;">{{$sub_service->name}}</h4>
@@ -514,6 +514,7 @@
                 disableButton: true,
                 buttonSelector: "#"+element_id,
                 success: function (response) {
+                    window.location = '{{ route('front.cartPage') }}';
                     if(response.result=='fail')
                     {
                         swal({
@@ -585,6 +586,7 @@
                 disableButton: true,
                 buttonSelector: "#"+element_id,
                 success: function (response) {
+                    window.location = '{{ route('front.cartPage') }}';
                     if(response.result=='fail')
                     {
                         swal({

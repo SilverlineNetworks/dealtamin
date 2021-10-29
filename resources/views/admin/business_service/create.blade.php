@@ -121,7 +121,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6 tax_percentage">
+                            <div class="col-md-6 tax_percentage hide">
                                 <div class="form-group">
                                     <label>Tax Percentage</label>
                                     <input type="text" name="tax_percentage" id="tax_percentage" value="0" class="form-control form-control-lg" autocomplete="off">

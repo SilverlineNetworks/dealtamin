@@ -20,7 +20,104 @@
                     <div class="col-12 booking_step_heading text-center">
                         <h1>@lang('front.summary.checkout.heading.bookingSummary')</h1>
                     </div>
-                    <div class="mx-auto step_2_booking_summary">
+                    <div class="col-6">
+                        <div class="mx-auto step_2_booking_summary mt-1" style="padding: 12px !important;width:auto;">
+                            <div class="d-flex justify-content-between">
+                                <p>@lang('front.additionalNotes')</p>
+                            </div>
+                            <form id="booking" method="POST" class="ajax-form">
+                                <div class="d-flex justify-content-between">
+                                    @csrf
+                                    <input type="hidden" name="request_type" value="{{$request_type}}">
+                                    <textarea class="form-control" rows="4" name="additional_notes" placeholder="@lang('front.writeYourMessageHere')"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        @if ($request_type=='booking')
+                            <?php foreach ($products as $key => $value):
+                                $image = '';
+                                if (isset($products[$key]->image[0])) {
+                                    $image = $products[$key]->image[0];
+                                }
+                                ?>
+                                <div class="d-flex justify-content-between mb-4">
+                                        <div>
+                                            @php if (!empty($image)) { @endphp
+                                                <img style="width:50px" src="{{ asset('user-uploads/service/'.$products[$key]->unique_id.'/'.$image) }}" alt="Image" />
+                                            @php } else { @endphp
+                                                <img style="width:50px" src="{{ asset('img/no-image.jpg') }}" alt="Image" />
+                                            @php } @endphp
+
+                                            {{$products[$key]->name}}
+                                        </div>
+                                    <p>
+                                        {{ $settings->currency->currency_symbol }} {{$products[$key]->sub_price}}
+                                    </p>
+                                </div>
+                            <?php endforeach; ?>
+
+                            <table style="width: 100%;margin-bottom:30px;">
+                                <tr>
+                                    <td style="text-align: right;font-weight:bold">Sub Total :</td>
+                                    <td style="text-align: right;font-weight:bold">{{ $settings->currency->currency_symbol }} {{$sub_total}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: right;font-weight:bold">Estimated VAT :</td>
+                                    <td style="text-align: right;font-weight:bold">{{ $settings->currency->currency_symbol }} {{$estimated_vat + $including_vat}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: right;font-weight:bold">Total Including VAT :</td>
+                                    <td style="text-align: right;font-weight:bold">{{ $settings->currency->currency_symbol }} {{$sub_total + $estimated_vat + $including_vat}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: right;font-weight:bold">Coupon Discount :</td>
+                                    <td style="text-align: right;font-weight:bold">-{{ $settings->currency->currency_symbol }} {{$discount}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: right;font-weight:bold">Total Payable Amount :</td>
+                                    <td style="text-align: right;font-weight:bold">{{ $settings->currency->currency_symbol }} {{$totalAmount}}</td>
+                                </tr>
+                            </table>
+
+                            <div class="d-flex justify-content-between mb-4">
+                                <p>@lang('front.bookingDate')</p>
+                                <p>
+                                    {{ \Carbon\Carbon::createFromFormat('Y-m-d', $bookingDetails['bookingDate'])->isoFormat('dddd, MMMM Do') }}
+                                </p>
+                            </div>
+                            <div class="d-flex justify-content-between mb-4">
+                                <p>@lang('front.bookingTime')</p>
+                                <p>
+                                    {{ \Carbon\Carbon::createFromFormat('H:i:s', $bookingDetails['bookingTime'])->format($settings->time_format) }}
+                                </p>
+                            </div>
+                            <?php /* ?>
+                            <div class="d-flex justify-content-between mb-4">
+                                <p>@lang('front.amountToPay')</p>
+                                <p>
+                                    <span class="rupee">{{ $settings->currency->currency_symbol }}</span>{{ $totalAmount }}
+                                </p>
+                            </div>
+                            <?php */ ?>
+                            @if(!empty($emp_name))
+                                <div class="d-flex justify-content-between mb-4">
+                                    <p>@lang('app.employee')</p>
+                                    <p>{{ $emp_name }} </p>
+                                </div>
+                            @endif
+
+                        @else
+                            <div class="d-flex justify-content-between mb-4">
+                                <p>@lang('front.amountToPay')</p>
+                                <p>
+                                    <span class="rupee">{{ $settings->currency->currency_symbol }}</span>{{ $totalAmount }}
+                                </p>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="mx-auto step_2_booking_summary" style="display: none">
 
                         @if ($request_type=='booking')
                             <div class="d-flex justify-content-between">
@@ -58,18 +155,7 @@
                         @endif
 
                     </div>
-                    <div class="mx-auto step_2_booking_summary mt-4">
-                        <div class="d-flex justify-content-between">
-                            <p>@lang('front.additionalNotes')</p>
-                        </div>
-                        <form id="booking" method="POST" class="ajax-form">
-                            <div class="d-flex justify-content-between">
-                                @csrf
-                                <input type="hidden" name="request_type" value="{{$request_type}}">
-                                <textarea class="form-control" rows="4" name="additional_notes" placeholder="@lang('front.writeYourMessageHere')"></textarea>
-                            </div>
-                        </form>
-                    </div>
+
                 </div>
             @else
                 {{-- when user is NOT logged in --}}
@@ -134,6 +220,51 @@
                                 <h2>@lang('front.summary.checkout.heading.bookingSummary')</h2>
 
                                 @if ($request_type=='booking')
+                                    <?php foreach ($products as $key => $value):
+                                        $image = '';
+                                        if (isset($products[$key]->image[0])) {
+                                            $image = $products[$key]->image[0];
+                                        }
+                                        ?>
+                                        <div class="d-flex justify-content-between mb-4">
+                                                <div>
+                                                    @php if (!empty($image)) { @endphp
+                                                        <img style="width:50px" src="{{ asset('user-uploads/service/'.$products[$key]->unique_id.'/'.$image) }}" alt="Image" />
+                                                    @php } else { @endphp
+                                                        <img style="width:50px" src="{{ asset('img/no-image.jpg') }}" alt="Image" />
+                                                    @php } @endphp
+
+                                                    {{$products[$key]->name}}
+                                                </div>
+                                            <p>
+                                                {{ $settings->currency->currency_symbol }} {{$products[$key]->sub_price}}
+                                            </p>
+                                        </div>
+                                    <?php endforeach; ?>
+
+                                    <table style="width: 100%;margin-bottom:30px;">
+                                        <tr>
+                                            <td style="text-align: right;font-weight:bold">Sub Total :</td>
+                                            <td style="text-align: right;font-weight:bold">{{ $settings->currency->currency_symbol }} {{$sub_total}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: right;font-weight:bold">Estimated VAT :</td>
+                                            <td style="text-align: right;font-weight:bold">{{ $settings->currency->currency_symbol }} {{$estimated_vat + $including_vat}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: right;font-weight:bold">Total Including VAT :</td>
+                                            <td style="text-align: right;font-weight:bold">{{ $settings->currency->currency_symbol }} {{$sub_total + $estimated_vat + $including_vat}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: right;font-weight:bold">Coupon Discount :</td>
+                                            <td style="text-align: right;font-weight:bold">-{{ $settings->currency->currency_symbol }} {{$discount}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: right;font-weight:bold">Total Payable Amount :</td>
+                                            <td style="text-align: right;font-weight:bold">{{ $settings->currency->currency_symbol }} {{$totalAmount}}</td>
+                                        </tr>
+                                    </table>
+
                                     <div class="d-flex justify-content-between mb-4">
                                         <p>@lang('front.bookingDate')</p>
                                         <p>
@@ -146,13 +277,14 @@
                                             {{ \Carbon\Carbon::createFromFormat('H:i:s', $bookingDetails['bookingTime'])->format($settings->time_format) }}
                                         </p>
                                     </div>
+                                    <?php /* ?>
                                     <div class="d-flex justify-content-between mb-4">
                                         <p>@lang('front.amountToPay')</p>
                                         <p>
                                             <span class="rupee">{{ $settings->currency->currency_symbol }}</span>{{ $totalAmount }}
                                         </p>
                                     </div>
-
+                                    <?php */ ?>
                                     @if(!empty($emp_name))
                                         <div class="d-flex justify-content-between mb-4">
                                             <p>@lang('app.employee')</p>

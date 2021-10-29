@@ -196,10 +196,57 @@ class BookingController extends AdminBaseController
             ])
             ->find($id);
 
+        /*
+        if ($tax_details->tax_type == 1 && !empty($tax->percent)) {
+            $sub_total += round($products[$k]['price'],2);
+            $vat = ($products[$k]['price'] * $tax->percent) / 100;
+            $estimated_vat += $vat;
+            $products[$k]['sub_price'] = $products[$k]['price'];
+            $products[$k]['vat'] = $vat;
+            $products[$k]['total'] = round($vat + $products[$k]['sub_price'],2);
+        }
+        else {
+            $without_vat = $products[$k]['price'] * 100 / (100 + $tax->percent);
+            $products[$k]['sub_price'] = round($without_vat, 2);
+            $sub_total += $without_vat;
+            $including_vat += round($products[$k]['price'] - $without_vat,2);
+            $products[$k]['vat'] = round($products[$k]['price'] - $without_vat,2);
+            $products[$k]['total'] = round($products[$k]['vat'] + $without_vat,2);
+        }
+        */
+
+
+
+        $tax = TaxSetting::active()->first();
+        $sub_total = $estimated_vat = $including_vat = 0;
+        foreach($booking->items AS $item) {
+            $service_id = $item->business_service_id;
+            $tax_details = DB::Table('business_services')->select('tax_type', 'tax_percentage')->where('id', $service_id)->first();
+
+            if ($tax_details->tax_type == 1 && !empty($tax->percent)) {
+                $sub_total += round($item->unit_price,2);
+                $vat = ($item->unit_price * $tax->percent) / 100;
+                $estimated_vat += $vat;
+                $item->sub_price = $item->unit_price;
+                $item->vat = $vat;
+                $item->total = round($vat + $item->sub_price,2);
+                $item->vat_percentage = $tax->percent;
+            }
+            else {
+                $without_vat = $item->unit_price * 100 / (100 + $tax->percent);
+                $item->sub_price = round($without_vat, 2);
+                $sub_total += $without_vat;
+                $including_vat += round($item->unit_price - $without_vat,2);
+                $item->vat = round($item->unit_price - $without_vat,2);
+                $item->total = round($item->vat + $without_vat,2);
+                $item->vat_percentage = '';
+            }
+        }
+
         $current_url = ($request->current_url != null) ? $request->current_url: 'backend';
         $commonCondition = $booking->payment_status == 'pending' && $booking->status != 'canceled' && $this->credentials->show_payment_options == 'show' && !$this->user->is_admin && !$this->user->is_employee;
 
-        $view = view('admin.booking.show', compact('booking', 'commonCondition', 'current_url'))->render();
+        $view = view('admin.booking.show', compact('including_vat','estimated_vat','sub_total','booking', 'commonCondition', 'current_url'))->render();
 
         return Reply::dataOnly(['status' => 'success', 'view' => $view]);
     }

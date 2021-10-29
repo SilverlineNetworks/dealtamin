@@ -179,7 +179,15 @@
                 <table class="table table-condensed">
                     <tr class="h6">
                         <td class="border-top-0 text-right">@lang('app.serviceSubTotal')</td>
-                        <td class="border-top-0">{{ $settings->currency->currency_symbol.number_format((float)$booking->original_amount, 2, '.', '') }}</td>
+                        <td class="border-top-0">{{ $settings->currency->currency_symbol.number_format((float)$sub_total, 2, '.', '') }} </td>
+                    </tr>
+                    <tr class="h6">
+                        <td class="border-top-0 text-right">Estimated VAT</td>
+                        <td class="border-top-0">{{ $settings->currency->currency_symbol.number_format((float)$estimated_vat, 2, '.', '') }} </td>
+                    </tr>
+                    <tr class="h6">
+                        <td class="border-top-0 text-right">Total Including VAT</td>
+                        <td class="border-top-0">{{ $settings->currency->currency_symbol.number_format((float)$including_vat, 2, '.', '') }} </td>
                     </tr>
                     @if($booking->discount > 0)
                     <tr class="h6">
@@ -189,7 +197,7 @@
                     @endif
 
                     @if($booking->tax_amount > 0)
-                    <tr class="h6">
+                    <tr class="h6" style="display:none">
                         <td class="text-right">{{ $booking->tax_name.' ('.$booking->tax_percent.'%)' }}</td>
                         <td>{{ $settings->currency->currency_symbol.number_format((float)$booking->tax_amount, 2, '.', '') }}</td>
                     </tr>
