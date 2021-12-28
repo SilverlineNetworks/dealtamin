@@ -22,7 +22,7 @@
                             <li><a href="{{ $page->slug }}"><span></span>{{ ucwords($page->title) }} </a></li>
                         @endforeach
                         <li><a href="{{ route('login') }}"><span></span>@lang('app.login') / @lang('front.register')</a></li>
-                        <li><a href="{{ route('front.register') }}"><span></span>@lang('front.becomeVendor')</a></li>
+                        <li style="display: none"><a href="{{ route('front.register') }}"><span></span>@lang('front.becomeVendor')</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3 col-6">

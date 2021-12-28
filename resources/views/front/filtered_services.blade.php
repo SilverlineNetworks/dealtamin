@@ -1,3 +1,8 @@
+<style type="text/css">
+  .single_deal_box .card-text .deal_card_name {
+    padding: 0 !important;
+  }
+</style>
 <div class="mt-4  d-flex flex-wrap">
     @foreach ($services as $service)
         <div class="col-md-4 mobile-no-padding">
@@ -26,9 +31,9 @@
                     <p class="card-text">
                         <span class="deal_card_current_price">{{ $settings->currency->currency_symbol }}{{ $service->discounted_price }}</span>
                         @if($service->discount > 0)
-                        <span class="deal_card_old_price">{{ $settings->currency->currency_symbol }}{{ $service->price }}</span>|
-                        @else &nbsp;&nbsp;|
+                        <span class="deal_card_old_price">{{ $settings->currency->currency_symbol }}{{ $service->price }}</span>
                         @endif
+                        <br/>
                         <span class="deal_card_name">{{ $service->company->company_name }}</span>
                         <div class="deal_card_location">{{ $service->location->name }}</div>
                     </p>

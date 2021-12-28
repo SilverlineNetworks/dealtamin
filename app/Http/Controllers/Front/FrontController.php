@@ -582,8 +582,9 @@ class FrontController extends FrontBaseController
 
     public function bookingSlots(Request $request)
     {
-        $booking_per_day =  $this->getCartCompanyDetail()->booking_per_day;
-
+        $companyId = 0;
+        $booking_per_day = 0;
+        $booking_per_day =  (int) $this->getCartCompanyDetail()->booking_per_day;
         $companyId = $this->getCartCompanyDetail()->id;
 
         if (!is_null($this->user) && $booking_per_day !=(0||'') && $booking_per_day <= $this->user->userBookingCount(Carbon::createFromFormat('Y-m-d', $request->bookingDate)))
@@ -1791,8 +1792,11 @@ class FrontController extends FrontBaseController
         $products = json_decode(request()->cookie('products'), true);
 
         $companyIds = [];
-        foreach ($products as $key => $product) {
-            $companyIds[] = $product['companyId'];
+
+        if (is_array($products) && count($products) > 0) {
+          foreach ($products as $key => $product) {
+              $companyIds[] = $product['companyId'];
+          }
         }
 
         if(sizeof($companyIds) > 0) {

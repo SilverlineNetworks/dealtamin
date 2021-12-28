@@ -99,13 +99,13 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="5">
+                                    <td colspan="6">
                                         <ul class="cart-buttons">
                                             <li>
                                             </li>
                                             <li>
                                                 <a href="javascript:;" data-key="all" class="btn btn-custom btn-blue delete-item" id="clear-cart">@lang('front.buttons.clearCart')</a>
-                                                <a href="{{ route('front.index') }}" class="btn btn-custom btn-blue">@lang('front.buttons.continueBooking')</a>
+                                                <a style="display: none" href="{{ route('front.index') }}" class="btn btn-custom btn-blue">@lang('front.buttons.continueBooking')</a>
                                             </li>
                                         </ul>
                                     </td>
@@ -258,7 +258,7 @@
             @if (!is_null($products))
                 <div class="row">
                     <div class="col-12 d-flex justify-content-between booking_step_buttons">
-                        <button class="btn d-flex align-items-center go-back"><i class="zmdi zmdi-long-arrow-left"></i>@lang('front.navigation.goBack')
+                        <button class="btn d-flex align-items-center go-back" id="clear-cart"><i class="zmdi zmdi-long-arrow-left"></i>@lang('front.navigation.goBack')
                         </button>
                         <a id="nextBtn" href="javascript:;" class="btn btn-custom btn-dark add-booking-details">@lang('front.navigation.toCheckout') <i class="zmdi zmdi-long-arrow-right"></i></a>
                         <!--<button class="btn d-flex align-items-center next-step hide">

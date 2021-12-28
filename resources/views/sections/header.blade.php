@@ -89,7 +89,16 @@
                 <div class="col-lg-4 col-md-5 d-flex headerTopRight hide_mobile">
                     <select class="myselect align-items-center" id="language">
                         @foreach ($languages as $language)
-                            <option @if (\Cookie::get('appointo_multi_vendor_language_code')==$language->language_code) selected @endif value="{{ $language->language_code }}">{{ $language->language_name }}</option>
+                            <?php
+                              $sel = '';
+                              if (Cookie::get('appointo_multi_vendor_language_code')==$language->language_code) {
+                                $sel = 'selected';
+                              }
+                              else if ($language->language_code == 'en') {
+                                $sel = 'selected';
+                              }
+                            ?>
+                            <option {{$sel}} value="{{ $language->language_code }}">{{ $language->language_name }}</option>
                         @endforeach
                     </select>
 
@@ -177,7 +186,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('front.page', 'contact-us') }}"> @lang('app.contactUs') </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" style="display: none;">
                             <a class="nav-link" href="{{ route('front.register') }}"> @lang('menu.listYourBusiness') </a>
                         </li>
 

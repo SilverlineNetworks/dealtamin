@@ -402,6 +402,30 @@
 @push('footer-script')
     <script>
 
+        $('document').ready(function() {
+            
+            let ele = $(this);
+            let key = $(this).data('key');
+
+            var url = '{{ route('front.deleteProduct', ':id') }}';
+            url = url.replace(':id', 'all');
+
+            $.easyAjax({
+                url: url,
+                type: 'POST',
+                data: {_token: $("meta[name='csrf-token']").attr('content')},
+                redirect: false,
+                blockUI: false,
+                disableButton: true,
+                buttonSelector: "#clear-cart",
+                success: function (response) {
+                    if (response.status == 'success') {
+
+                    }
+                }
+            })
+        });
+
         $('body').on('click', '#increase', function() {
             var currentValue = $('#number').val();
             $('#number').val(parseInt(currentValue) + 1);
