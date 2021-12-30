@@ -173,6 +173,21 @@
             </div>
         </div>
     </div>
+
+    <?php
+      if (!isset($sub_total)) {
+        $sub_total = 0;
+      }
+
+      if (isset($estimated_vat)) {
+        $estimated_vat = 0;
+      }
+
+      if (isset($including_vat)) {
+        $including_vat = 0;
+      }
+    ?>
+
     <div class="col-md-5 border-top amountDetail">
         <div class="row">
             <div class="col-md-12">

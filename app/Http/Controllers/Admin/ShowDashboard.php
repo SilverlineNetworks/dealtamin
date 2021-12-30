@@ -116,8 +116,11 @@ class ShowDashboard extends AdminBaseController
             }
             return Reply::dataOnly(['status' => 'success', 'totalBooking' => $totalBooking, 'pendingBooking' => $pendingBooking, 'approvedBooking' => $approvedBooking, 'inProgressBooking' => $inProgressBooking, 'completedBooking' => $completedBooking, 'canceledBooking' => $canceledBooking, 'offlineBooking' => $offlineBooking, 'onlineBooking' => $onlineBooking, 'totalCustomers' => $totalCustomers, 'totalEarnings' => round($totalEarnings, 2), 'user' => $this->user]);
         }
+
+        $recentSales = null;
+
         if($show_recent_employee){
-            $recentSales = Booking::orderBy('id', 'desc')
+            /*$recentSales = Booking::orderBy('id', 'desc')
             ->with(['user',
             'user'=> function($q)
                 {
@@ -125,7 +128,47 @@ class ShowDashboard extends AdminBaseController
                 }
             ])
             ->take(20)
-            ->get();
+            ->get();*/
+
+            if($this->user->hasRole('customer')){
+                $recentSales = Booking::with([
+                    'user'=> function($q)
+                        {
+                            $q->withoutGlobalScope('company')->where('id', $this->user->id);
+                        }
+                    ])->where('status', '!=', 'canceled')->where('user_id', $this->user->id)->orderBy('id', 'desc')->take(20)->get();
+
+            } elseif ($this->user->hasRole('employee')) {
+                $recentSales = Booking::with([
+                    'user'=> function($q)
+                        {
+                            $q->withoutGlobalScope('company');
+                        }
+                    ])->where(function($q){
+                        $q->where('status', '!=', 'canceled');
+                        $q->where(function($q){
+                            $q->where('user_id', $this->user->id);
+                            $q->orWhere(function($q){
+                                $q->whereHas('users', function($q){
+                                    $q->where('id', $this->user->id);
+                                });
+                            });
+                        });
+                    })
+                    ->orderBy('id', 'desc')->take(20)->get();
+            } elseif ($this->user->is_admin) {
+                $recentSales = Booking::with([
+                    'user'=> function($q)
+                        {
+                            $q->withoutGlobalScope('company');
+                        }
+                    ])->where(function($q){
+                        $q->where('status', '!=', 'canceled');
+                    })
+                    ->orderBy('id', 'desc')->take(20)->get();
+            }
+
+
         }
         else{
             $recentSales = null;
