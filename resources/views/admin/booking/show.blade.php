@@ -179,11 +179,11 @@
         $sub_total = 0;
       }
 
-      if (isset($estimated_vat)) {
+      if (!isset($estimated_vat)) {
         $estimated_vat = 0;
       }
 
-      if (isset($including_vat)) {
+      if (!isset($including_vat)) {
         $including_vat = 0;
       }
     ?>

@@ -551,6 +551,7 @@ class FrontController extends FrontBaseController
         $id = $booking->id;
         Mail::send('emails.booking_confirmation_new', $data, function($message) use ($to_name,$to_email, $id, $company) {
             $message->to($to_email, $to_name)->subject(__('email.bookingConfirmation.subject').' '.config('app.name').'!');
+            //$message->to('jobindcruz@gmail.com', $to_name)->subject(__('email.bookingConfirmation.subject').' '.config('app.name').'!');
             $message->from($company->company_email,$company->company_name);
         });
         /*

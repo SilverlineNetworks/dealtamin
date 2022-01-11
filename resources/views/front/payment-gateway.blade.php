@@ -70,7 +70,7 @@
                                                     <i class="fa fa-cc-stripe"></i>
                                                 </span>
                                             </div>
-                                            <span class="payment_name">@lang('front.buttons.stripe')</span>
+                                            <span class="payment_name">@lang('front.buttons.visa')</span>
                                         </a>
                                     </div>
                                 @endif

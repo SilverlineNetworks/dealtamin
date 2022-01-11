@@ -108,6 +108,7 @@ return array (
     'clearCart' => 'Clear Booking',
     'offlinePayment' => 'Will Pay At the Shop',
     'stripe' => 'Stripe',
+    'visa' => 'Visa',
     'paypal' => 'Paypal',
     'razorpay' => 'RazorPay',
     'cartClearedSuccessfully' => 'Booking cleared successfully',
